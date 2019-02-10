@@ -34,6 +34,10 @@ Visit http://www.arduino.cc to learn about the Arduino.
 Version 2.0 6/2012 MDG
 */
 
+int CLK = 2; // CLK Pin to Pin 2 of Arduino, EXT INT
+int DIR = 3; // DT Pin to Pin 3 of Arduino
+bool DT; // LOW -> CW, HIGH -> CCW
+int count = 0;
 
 // First we'll define the pins by name to make the sketch
 // easier to follow.
@@ -62,6 +66,10 @@ void setup()
 pinMode(RED_PIN, OUTPUT);
 pinMode(GREEN_PIN, OUTPUT);
 pinMode(BLUE_PIN, OUTPUT);
+
+pinMode(DIR, INPUT);
+Serial.begin(9600);
+attachInterrupt(digitalPinToInterrupt(CLK),CW_Test,FALLING);
 }
 
 
@@ -83,7 +91,7 @@ void loop()
 // function here (telling it to run). The actual function code
 // is further down in the sketch.
 
-mainColors();
+//mainColors();
 
 // The above function turns the individual LEDs full-on and
 // full-off. If you want to generate more than eight colors,
@@ -97,7 +105,34 @@ mainColors();
 // steps through all the colors. Again we're just calling it
 // here; the actual code is further down in this sketch.
 
-showSpectrum();
+//showSpectrum();
+
+  Serial.println(DT);
+  Serial.println("\n");
+  Serial.println(count);
+  delay(200);
+}
+const int increment = 10; 
+void CW_Test(){
+  
+  bool val = digitalRead(DIR);
+  if(val == HIGH)
+  {
+    DT = LOW;
+    count = count + increment;
+    if(count>767){
+      count = 0;      
+    }
+  }
+  else
+  {
+    DT = HIGH;
+    count = count-increment;
+    if(count < 0){
+      count = 767;
+    }
+  }
+  showRGB(count);
 }
 
 
